@@ -1,0 +1,39 @@
+{
+  "projeto": "Maquina Estatistica - IFES Probabilidade e Estatistica I",
+  "aviso": "Simulador academico - somente creditos ficticios",
+  "python": "3.14.0",
+  "gerador": "random.Random (Mersenne Twister)",
+  "bibliotecas": {
+    "numpy": "2.5.4",
+    "pandas": "3.0.6",
+    "matplotlib": "3.11.2"
+  },
+  "aposta": 1.0,
+  "simbolos": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E"
+  ],
+  "pagamentos_base": {
+    "A": 5.0,
+    "B": 10.0,
+    "C": 15.0,
+    "D": 25.0,
+    "E": 50.0
+  },
+  "sementes": {
+    "E1": 2026,
+    "E2": [
+      10,
+      2026,
+      123456
+    ],
+    "E3": 42,
+    "extras_exposicao": [
+      800,
+      1200
+    ]
+  }
+}

@@ -1,0 +1,2 @@
+﻿metodo,n,media_lucro,erro_padrao,limite_inferior,limite_superior,esperanca_teorica,observacao
+Intervalo normal aproximado de 95% para a media,10000,-0.1315,0.05275034630126603,-0.23489067875048142,-0.028109321249518593,-0.16,Aproximacao baseada no erro-padrao; nao e intervalo para cada rodada individual.

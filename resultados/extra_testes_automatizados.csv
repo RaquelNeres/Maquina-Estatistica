@@ -1,0 +1,14 @@
+﻿teste,aprovado
+Pagamento A-A-A,True
+Pagamento B-B-B,True
+Pagamento C-C-C,True
+Pagamento D-D-D,True
+Pagamento E-E-E,True
+Combinacao sem trio nao paga,True
+Lucro de premio 5 e 4,True
+Lucro sem premio e -1,True
+Semente reproduz resultados,True
+Total de rodadas preservado,True
+Amostra vazia tratada,True
+"Esperanca do premio = 0,84",True
+RTP teorico = 84%,True

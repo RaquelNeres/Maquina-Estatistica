@@ -1,0 +1,3 @@
+﻿tabela,premio_esperado_teorico,rtp_teorico_percentual,lucro_esperado_teorico,desvio_padrao_lucro_observado,lucro_medio_observado,pagamentos
+Base,0.84,84.0,-0.16000000000000003,5.275034630126603,-0.1315,"{""A"": 5.0, ""B"": 10.0, ""C"": 15.0, ""D"": 25.0, ""E"": 50.0}"
+Pagamento uniforme,0.84,84.0,-0.16000000000000003,4.17401140356848,-0.1348,"{""A"": 21.0, ""B"": 21.0, ""C"": 21.0, ""D"": 21.0, ""E"": 21.0}"
