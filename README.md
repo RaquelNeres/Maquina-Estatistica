@@ -29,6 +29,18 @@ streamlit run app.py
 # se der erro no Device Guard
 python -m streamlit run app.py 
 ```
+### Para o Ubuntu no WSL (caso o Windows continue com restrições do Device Guard)
+Caso as políticas de segurança do Windows (Device Guard / WDAC) impeçam o carregamento de binários `.pyd` (como o NumPy), execute a aplicação via WSL:
+```bash
+sudo apt update && sudo apt install -y python3-venv python3-pip
+
+python3 -m venv .venv_linux
+source .venv_linux/bin/activate
+
+pip install -r requirements.txt
+streamlit run app.py
+```
+
 As abas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A página educativa explica o modelo e os resultados E1–E5 em linguagem acessível, com fontes verificáveis. A aba de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
 
 ## Conteúdo implementado
