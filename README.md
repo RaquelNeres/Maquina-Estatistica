@@ -25,13 +25,17 @@ Para abrir o simulador interativo no navegador:
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+
+# se der erro no Device Guard
+python -m streamlit run app.py 
 ```
-As abas **Jogar**, **Simulação** e **Experimentos** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A aba de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
+As abas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A página educativa explica o modelo e os resultados E1–E5 em linguagem acessível, com fontes verificáveis. A aba de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
 
 ## Conteúdo implementado
 - Máquina de três rolos e avaliação exclusiva da linha central.
 - Experimentos obrigatórios E1–E5, com sementes especificadas no enunciado.
 - CSVs, gráficos e metadados para reprodução.
+- Página educativa para público não especializado, com resultados próprios e fontes verificáveis.
 - Extras: intervalo aproximado de 95% para a média do lucro, comparação de distribuições com mesmo RTP, limites de exposição, análise de sensibilidade e testes automatizados.
 
 ## Observações para o relatório
