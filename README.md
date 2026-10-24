@@ -41,13 +41,15 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-As abas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A página educativa explica o modelo e os resultados E1–E5 em linguagem acessível, com fontes verificáveis. A aba de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
+As abas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A página educativa explica o modelo e os resultados E1–E5 em linguagem acessível, com fontes verificáveis. Na aba **Jogar**, os retratos representam os símbolos A–E; a tabela ao lado mostra os pagamentos e, logo abaixo, a legenda associa cada professor à sua letra. Ao girar, os retratos mudam durante cinco segundos e o áudio de `assets/audio/roleta_silvio.m4a` toca junto. Use Tab e Enter ou Espaço para operar os controles. O painel de verificação acessível permite registrar a checagem de foco, operação por teclado, contraste e informação textual. A aba de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
 
 ## Conteúdo implementado
 - Máquina de três rolos e avaliação exclusiva da linha central.
 - Experimentos obrigatórios E1–E5, com sementes especificadas no enunciado.
 - CSVs, gráficos e metadados para reprodução.
 - Página educativa para público não especializado, com resultados próprios e fontes verificáveis.
+- Interface de jogo com retratos dos professores: A = Giraldeli, B = Calhau, C = Graziela, D = Rapchan, E = Fidelis.
+- Controles de teclado, foco visível, texto com contraste e verificação de uso por checklist.
 - Extras: intervalo aproximado de 95% para a média do lucro, comparação de distribuições com mesmo RTP, limites de exposição, análise de sensibilidade e testes automatizados.
 
 ## Observações para o relatório
