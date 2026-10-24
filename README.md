@@ -6,11 +6,11 @@ Simulador acadêmico para o Trabalho I de Probabilidade e Estatística I.
 
 ## Requisitos
 - Python 3.10 ou superior recomendado
-- `numpy`, `pandas` e `matplotlib`
+- `numpy`, `pandas`, `streamlit` e `matplotlib`
 
 Instale as dependências:
 ```bash
-pip install numpy pandas matplotlib
+pip install -r requirements.txt
 ```
 
 ## Como executar
@@ -20,10 +20,11 @@ python maquina_estatistica.py
 ```
 O programa cria/atualiza a pasta `resultados/`, com tabelas CSV, gráficos PNG e metadados do ambiente.
 
+<br>
+
 ## Interface visual
 Para abrir o simulador interativo no navegador:
 ```bash
-pip install -r requirements.txt
 streamlit run app.py
 
 # se der erro no Device Guard
@@ -41,7 +42,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-As abas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A página educativa explica o modelo e os resultados E1–E5 em linguagem acessível, com fontes verificáveis. Na aba **Jogar**, os retratos representam os símbolos A–E; a tabela ao lado mostra os pagamentos e, logo abaixo, a legenda associa cada professor à sua letra. Ao girar, os retratos mudam durante cinco segundos e o áudio de `assets/audio/roleta_silvio.m4a` toca junto. Use Tab e Enter ou Espaço para operar os controles. O painel de verificação acessível permite registrar a checagem de foco, operação por teclado, contraste e informação textual. A aba de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
+As páginas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A página educativa explica o modelo e os resultados E1–E5 em linguagem acessível, com fontes verificáveis. Em **Jogar**, os retratos representam os símbolos A–E; a tabela mostra os pagamentos e a legenda associa cada professor à sua letra. A música de `assets/audio/fortune_tiger_theme.m4a` toca em loop e pode ser ligada ou desligada pelo ícone ao lado do título. O efeito sonoro da roleta toca ao girar. Se o navegador bloquear a reprodução automática, clique no ícone para ativar a música. Use Tab e Enter ou Espaço para operar os controles. O painel de verificação acessível permite registrar a checagem de foco, operação por teclado, contraste e informação textual. A página de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
 
 ## Conteúdo implementado
 - Máquina de três rolos e avaliação exclusiva da linha central.
@@ -58,7 +59,8 @@ As abas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** pe
 - Os resultados observados podem diferir dos valores teóricos por variabilidade aleatória.
 - Antes da entrega, confira as tabelas e gráficos, redija as interpretações com suas próprias palavras e verifique as exigências completas do enunciado.
 
-## Declaração de uso de IA — sugestão para revisar
-"Foi utilizada uma ferramenta de IA como apoio à estruturação inicial do código e à organização de análises. O grupo revisou, executou e conferiu os cálculos, os resultados e as interpretações, responsabilizando-se pelo conteúdo final."
+## Ferramentas e declaração de uso de IA
 
-A declaração deve ser ajustada ao uso real feito pelo grupo e às regras do professor.
+O layout visual foi elaborado no **Excalidraw**. Ferramentas de IA foram usadas como apoio à implementação do código e da interface, e para revisar o projeto com base na lista de requisitos obrigatórios e extras do enunciado. O **NotebookLM** foi usado para pesquisar materiais e esclarecer dúvidas pontuais que surgiram durante o desenvolvimento.
+
+![alt text](image.png)
