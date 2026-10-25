@@ -14,13 +14,35 @@
 
 <br>
 <br>
-<br>
 
 # Relatorio 
 
 Os CSVs mostram os resultados, mas não escrevem a interpretação por vocês. Por exemplo: no E1, a simulação observou 4,12% de prêmios e lucro médio de −0,1315 crédito por rodada, contra −0,16 teórico. No E3, 75% terminaram com perda e 67% esgotaram o saldo. Esses números precisam ser comentados no relatório, inclusive explicando que diferenças entre simulação e teoria podem ocorrer por variabilidade amostral.
 
 <br>
+<br>
+<br>
+
+# 🌟 Atividades extras — até 20 pontos
+As atividades abaixo podem render **até 20 pontos adicionais**. Para pontuar, implemente cada proposta e registre evidências no projeto.
+
+| Atividade | Valor | O que fazer |
+|---|:---:|---|
+| **Validação automatizada** | Até 3 pontos | **O que fazer:** Acrescentar pelo menos **cinco verificações/testes automatizados** relevantes no código (ex.: checagem automática de pagamentos, cálculo do lucro, controle de semente, totais acumulados e um caso-limite) e explicar como executá-los |
+| **Intervalos de confiança** | Até 4 pontos | **O que fazer:** Estimar um intervalo de confiança para o lucro médio ou para o RTP, explicando o método estatístico utilizado, as hipóteses e o significado da incerteza. Usar execuções independentes ou justificar o uso de reamostragem. |
+| **Mesma média, riscos diferentes** | Até 4 pontos | **O que fazer:** Construir uma tabela alternativa de pagamentos que possua **exatamente o mesmo RTP** da tabela base (84%), mas com uma **dispersão (variância/desvio-padrão) diferente**. Comparar as distribuições e os saldos simulações. |
+| **Limites de exposição** | Até 3 pontos | **O que fazer:** Comparar duas regras de parada predefinidas antes de simular. Analisar perdas, ganhos e o número de rodadas jogadas, diferenciando *tempo de exposição* de *esperança por rodada*. |
+| **Auditoria de uma afirmação pública** | Até 3 pontos | **O que fazer:** Verificar uma alegação quantitativa na sua fonte original (analisando definição, população, período, método e limitações), indo além da contextualização básica exigida no relatório. |
+| **Educação científica** | Até 3 pontos | **O que fazer:** Produzir um material de divulgação científica (uma página web ou um vídeo de até 3 minutos) direcionado ao público não especializado, apresentando os resultados próprios da simulação, conceitos explicados e fontes verificáveis. |
+| **Interface acessível** | Até 3 pontos | **O que fazer:** Implementar recursos de acessibilidade no programa (interação via teclado, contraste adequado de cores, informações visuais que não dependam apenas de cor) e demonstrar um teste de uso. |
+| **Análise de sensibilidade** | Até 3 pontos | **O que fazer:** Variar os valores de pagamentos ou probabilidades em **pelo menos cinco cenários diferentes** (indo além das duas tabelas do Experimento 5) e explicar como a esperança matemática e o RTP se alteram em cada cenário. |
+
+### 📐 Regras de pontuação
+
+- **Cálculo:** `Extras = min(20, soma dos pontos adicionais)`.
+- **Registro das evidências:** O grupo deve especificar no relatório e no `README` quais extras foram implementados e em qual parte do projeto/código se encontram as evidências.
+- **Pontuação parcial:** Itens incompletos ou meramente descritivos recebem nota parcial. Um mesmo resultado não é pontuado em duas opções diferentes.
+
 <br>
 <br>
 
@@ -35,3 +57,5 @@ Os CSVs mostram os resultados, mas não escrevem a interpretação por vocês. P
 | Interface acessível | **Parcial.** O Streamlit tem contraste ajustado e a linha premiada é indicada por cor e legenda, mas não encontrei uma verificação documentada de uso por teclado/acessibilidade. |
 | Validação automatizada | **Implementada.** Há 13 verificações em [maquina_estatistica.py](/D:/PROJETOS/maquina_estatistica/maquina_estatistica.py:459), com resultados em [extra_testes_automatizados.csv](/D:/PROJETOS/maquina_estatistica/resultados/extra_testes_automatizados.csv). Elas rodam ao executar `python maquina_estatistica.py` ([chamada no fluxo principal](/D:/PROJETOS/maquina_estatistica/maquina_estatistica.py:552)); o README poderia explicar isso explicitamente. |
 | Análise de sensibilidade | **Cálculo implementado; interpretação escrita pendente.** Há seis cenários em [maquina_estatistica.py](/D:/PROJETOS/maquina_estatistica/maquina_estatistica.py:432) e [extra_analise_sensibilidade.csv](/D:/PROJETOS/maquina_estatistica/resultados/extra_analise_sensibilidade.csv). |
+
+
