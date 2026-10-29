@@ -3,6 +3,7 @@
 from pathlib import Path
 import base64
 import html
+import json
 import random
 import time
 
@@ -24,8 +25,10 @@ ROOT = Path(__file__).resolve().parent
 RESULTADOS = ROOT / "resultados"
 ASSETS_PROFESSORES = ROOT / "assets" / "professores"
 CAMPUS_IMAGE = ROOT / "assets" / "campus_serra.jpg"
+IFES_LOGO = ROOT / "assets" / "logo_ifes.png"
 AUDIO_JOGO = ROOT / "assets" / "audio" / "fortune_tiger_theme.m4a"
 AUDIO_ROLETA = ROOT / "assets" / "audio" / "roleta_silvio.m4a"
+DURACAO_GIRO = 5.0
 DOCENTES = {
     "A": {"nome": "Giraldeli", "arquivo": "giraldeli.png"},
     "B": {"nome": "Calhau", "arquivo": "calhau.png"},
@@ -37,12 +40,26 @@ DOCENTES = {
 if "pagina_atual" not in st.session_state:
     st.session_state.pagina_atual = "Jogar"
 pagina_atual = st.session_state.pagina_atual
+if "menu_direito_recolhido" not in st.session_state:
+    st.session_state.menu_direito_recolhido = False
+menu_direito_recolhido = st.session_state.menu_direito_recolhido
+largura_menu_direito = 48 if menu_direito_recolhido else 220
+largura_menu_direito_mobile = 48 if menu_direito_recolhido else 195
+proporcao_menu_direito = 0.04 if menu_direito_recolhido else 0.17
+logo_direito = max(0, (largura_menu_direito - 126) // 2)
+logo_direito_mobile = max(0, (largura_menu_direito_mobile - 126) // 2)
 
 
 @st.cache_data
 def campus_fundo_data_uri() -> str:
     conteudo = base64.b64encode(CAMPUS_IMAGE.read_bytes()).decode("ascii")
     return f"data:image/jpeg;base64,{conteudo}"
+
+
+@st.cache_data
+def logo_ifes_data_uri() -> str:
+    conteudo = base64.b64encode(IFES_LOGO.read_bytes()).decode("ascii")
+    return f"data:image/png;base64,{conteudo}"
 
 
 @st.cache_data
@@ -57,15 +74,82 @@ def audio_roleta_data_uri() -> str:
     return f"data:audio/mp4;base64,{conteudo}"
 
 
-def efeito_roleta_html() -> str:
-    html_efeito = """<!doctype html><html><body style="margin:0;overflow:hidden">
+def animacao_roleta_html(resultado: dict) -> str:
+    tabuleiro_final = tabuleiro_de_resultado(resultado)
+    linhas_html = []
+    for indice_linha, linha in enumerate(tabuleiro_final):
+        celulas = []
+        for simbolo in linha:
+            docente = DOCENTES[simbolo]
+            imagem = imagem_data_uri(docente["arquivo"])
+            classe = "reel-cell payline" if indice_linha == 1 else "reel-cell"
+            celulas.append(f'<div class="{classe}"><img alt=""></div>')
+        linhas_html.append(f'<div class="slot-row">{"".join(celulas)}</div>')
+
+    imagens = {simbolo: imagem_data_uri(docente["arquivo"]) for simbolo, docente in DOCENTES.items()}
+    documento = """<!doctype html><html><head><meta charset="utf-8"><style>
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
+body { display: grid; place-items: start center; }
+.slot { position: relative; display: table; margin: 0 auto; padding: 22px; border-radius: 22px; background: #12243a; box-shadow: 0 12px 35px rgba(13,28,44,.28); }
+.slot-row { display: flex; justify-content: center; gap: 14px; margin: 12px 0; }
+.reel-cell { width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; padding: 6px; overflow: hidden; border-radius: 15px; background: white; }
+.reel-cell img { width: 138px; height: 138px; object-fit: cover; object-position: center 28%; border-radius: 11px; background: white; }
+.payline { border: 4px solid #f7c948; }
+@media (max-width: 600px) { .slot { padding: 12px; } .reel-cell { width: 90px; height: 90px; } .reel-cell img { width: 82px; height: 82px; } .slot-row { gap: 8px; } }
+</style></head><body><div class="slot" id="slot">__ROWS__</div>
 <audio id="spin-audio" src="__AUDIO_SOURCE__" preload="auto"></audio>
 <script>
-    const spinAudio = document.getElementById('spin-audio');
-    spinAudio.volume = 0.16;
-    spinAudio.play().catch(() => {});
+const images = __IMAGES__;
+const sequence = __SEQUENCE__;
+const finalBoard = __FINAL_BOARD__;
+const cells = Array.from(document.querySelectorAll('.reel-cell img'));
+const audio = document.getElementById('spin-audio');
+const durationMs = __DURATION__ * 1000;
+audio.volume = 0.16;
+function showBoard(board) {
+    cells.forEach((cell, i) => { cell.src = images[board[Math.floor(i / 3)][i % 3]]; });
+}
+function randomBoard() {
+    const board = Array.from({length: 3}, () => Array(3));
+    for (let col = 0; col < 3; col++) {
+        const start = Math.floor(Math.random() * sequence.length);
+        for (let row = 0; row < 3; row++) board[row][col] = sequence[(start + row) % sequence.length];
+    }
+    return board;
+}
+function startSpin() {
+    const startedAt = performance.now();
+    let nextFrameAt = startedAt;
+    function frame(now) {
+        const elapsed = now - startedAt;
+        if (elapsed >= durationMs) {
+            showBoard(finalBoard);
+            audio.pause();
+            audio.currentTime = 0;
+            return;
+        }
+        if (now >= nextFrameAt) {
+            showBoard(randomBoard());
+            nextFrameAt = now + 90;
+        }
+        requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+}
+audio.play().then(startSpin).catch(startSpin);
 </script></body></html>"""
-    return html_efeito.replace("__AUDIO_SOURCE__", audio_roleta_data_uri())
+    substituicoes = {
+        "__ROWS__": "".join(linhas_html),
+        "__AUDIO_SOURCE__": audio_roleta_data_uri(),
+        "__IMAGES__": json.dumps(imagens),
+        "__SEQUENCE__": json.dumps(list(modelo.SEQUENCIA_ROLO)),
+        "__FINAL_BOARD__": json.dumps(tabuleiro_final),
+        "__DURATION__": str(DURACAO_GIRO),
+    }
+    for marcador, valor in substituicoes.items():
+        documento = documento.replace(marcador, valor)
+    return documento
 
 
 def cabecalho_jogo_html() -> str:
@@ -143,10 +227,16 @@ st.markdown(
     .stApp, .stApp p, .stApp label, .stApp h1, .stApp h2, .stApp h3,
     .stApp h4, .stApp [data-testid="stMetricLabel"],
     .stApp [data-testid="stMetricValue"], .stApp [data-testid="stCaptionContainer"] {{ color: #17263a; }}
-    section[data-testid="stSidebar"] {{ width: 220px !important; {sidebar_css} }}
+    section[data-testid="stSidebar"] {{ width: 250px !important; {sidebar_css} }}
     [data-testid="stSidebar"] > div:first-child {{ background: #583425; }}
     [data-testid="stSidebar"] * {{ color: #fff7ed !important; }}
     [data-testid="stSidebar"] input {{ color: #17263a !important; }}
+    [data-testid="stSidebarContent"] {{ padding-top: 0 !important; }}
+    [data-testid="stSidebarUserContent"] {{ padding-top: 0 !important; margin-top: -1.25rem; }}
+    [data-testid="stSidebarUserContent"] [data-testid="stVerticalBlock"] {{ gap: .5rem; }}
+    [data-testid="stSidebar"] h2 {{ margin-top: 0; margin-bottom: .2rem; }}
+    [data-testid="stSidebar"] h3 {{ margin-top: .25rem; margin-bottom: .2rem; }}
+    [data-testid="stSidebar"] hr {{ margin: .35rem 0; }}
     [data-testid="stSidebarCollapsedControl"],
     button[data-testid="stSidebarCollapsedControl"],
     [data-testid="stSidebarCollapseButton"] {{
@@ -158,26 +248,54 @@ st.markdown(
     [data-testid="stAlert"] {{ color: #17263a; }}
     [data-testid="stAlert"] p {{ color: inherit !important; }}
     [data-testid="stDataFrame"] {{ background: white; }}
+    .prize-list {{ display: grid; gap: 7px; margin: 4px 0 8px; }}
+    .prize-item {{ display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; padding: 6px; border: 1px solid rgba(255,247,237,.22); border-radius: 12px; background: rgba(255,255,255,.07); }}
+    .prize-description {{ color: #fff7ed; font-size: .78rem; font-weight: 600; margin: 4px 0 1px; }}
+    .sidebar-note {{ color: rgba(255,247,237,.86); font-size: .72rem; line-height: 1.45; margin: 2px 0 6px; }}
+    .chance-panel {{ padding: 12px; border: 1px solid rgba(255,247,237,.25); border-radius: 12px; background: rgba(255,255,255,.08); margin: 4px 0 8px; }}
+    .chance-kicker {{ color: #f4a11a; font-size: .7rem; font-weight: 800; letter-spacing: .08em; margin-bottom: 4px; }}
+    .chance-title {{ color: #fff7ed; font-size: 1rem; font-weight: 700; margin-bottom: 8px; }}
+    .chance-summary {{ display: grid; gap: 6px; margin: 2px 0 0; }}
+    .chance-row {{ display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 9px; background: rgba(255,255,255,.08); font-size: .82rem; }}
+    .chance-row strong {{ color: #f4a11a; white-space: nowrap; }}
+    .st-key-session_rounds {{ margin-top: .65rem; margin-bottom: .15rem; }}
+    .st-key-prizes_section {{ margin-top: 1.1rem; }}
+    .prize-symbols {{ display: flex; align-items: center; gap: 4px; min-width: 0; }}
+    .prize-symbols img {{ width: 36px; height: 36px; object-fit: cover; object-position: center 28%; border-radius: 8px; background: white; }}
+    .prize-value {{ font-weight: 700; white-space: nowrap; color: #f4a11a; }}
+    .balance-card {{ padding: 10px 14px; border-radius: 14px; background: #fff; color: #17263a !important; border: 1px solid #d7e1ec; margin: 2px 0 6px; }}
+    .balance-label {{ color: #536579 !important; font-size: .82rem; }}
+    .balance-value {{ color: #17263a !important; font-size: 1.8rem; line-height: 1.2; font-weight: 700; margin-top: 3px; }}
     .stButton button:focus-visible, [data-testid="stCheckbox"] input:focus-visible {{
         outline: 3px solid #8a4b00 !important; outline-offset: 3px !important;
         box-shadow: 0 0 0 2px #ffffff !important;
     }}
-    .st-key-right_nav {{ position: fixed; z-index: 1000; top: 0; right: 0; bottom: 0; width: 220px; height: 100vh; min-height: 100vh; box-sizing: border-box; overflow-y: auto; background: #583425; border-radius: 0; padding: 5rem 1.1rem 2rem; }}
+    .st-key-right_nav {{ position: fixed; z-index: 1000; top: 0; right: 0; bottom: 0; width: {largura_menu_direito}px; height: 100vh; min-height: 100vh; box-sizing: border-box; overflow-y: auto; background: #583425; border-radius: 0; padding: {"4rem .4rem 1rem" if menu_direito_recolhido else "5rem 1.1rem 2rem"}; }}
     .st-key-right_nav h3, .st-key-right_nav p {{ color: #fff7ed !important; }}
     .st-key-right_nav .stButton {{ display: flex; justify-content: center; }}
     .st-key-right_nav .stButton button {{ width: 90%; margin: 0 auto; color: #f4a11a; background: transparent; border: 1px solid rgba(255,255,255,.18); text-align: center; }}
     .st-key-right_nav .stButton button:hover {{ background: rgba(255,255,255,.12); border-color: #f4a11a; }}
+    .st-key-right_nav .st-key-toggle_right_nav {{ position: absolute; z-index: 3; top: 2.4rem; right: .6rem; width: 36px; }}
+    .st-key-right_nav .st-key-toggle_right_nav button {{ width: 36px; min-width: 36px; height: 36px; padding: 0; border: 0; background: transparent; color: #fff7ed; font-size: 1.35rem; }}
+    .right-nav-settings-spacer {{ height: 1.15rem; }}
+    .ifes-logo {{ position: fixed; z-index: 1002; right: {logo_direito}px; bottom: 1rem; width: 126px; padding: 0; background: transparent; border: 0; box-shadow: none; pointer-events: none; }}
+    .ifes-logo img {{ display: block; width: 100%; height: auto; background: transparent; }}
     .st-key-game_machine {{ margin-top: -1.5rem; }}
     .st-key-game_panel {{ margin-top: 5rem; padding: 1.2rem 1.5rem; background: rgba(255,255,255,.95); border: 1px solid #d7e1ec; border-radius: 18px; box-shadow: 0 10px 35px rgba(15, 35, 55, .16); }}
-    .slot {{ background: #12243a; color: #f4f8ff; border-radius: 22px; padding: 22px; display: table; margin: 0 auto; box-shadow: 0 12px 35px rgba(13, 28, 44, .28); }}
+    .slot {{ position: relative; background: #12243a; color: #f4f8ff; border-radius: 22px; padding: 22px; display: table; margin: 0 auto; box-shadow: 0 12px 35px rgba(13, 28, 44, .28); }}
+    .round-payout {{ position: absolute; z-index: 5; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 0; background: transparent; border: 0; font-size: clamp(3rem, 7vw, 5rem); font-weight: 900; letter-spacing: .02em; animation: payout-pop 2.7s ease-out both; pointer-events: none; white-space: nowrap; }}
+    .round-payout.negative {{ color: #ff3535; text-shadow: 0 2px 5px #fff, 0 0 16px rgba(120,0,0,.9); }}
+    .round-payout.positive {{ color: #00db69; text-shadow: 0 2px 5px #fff, 0 0 16px rgba(0,80,30,.9); }}
+    @keyframes payout-pop {{ 0% {{ opacity: 0; transform: translate(-50%, -50%) scale(.35) rotate(-8deg); }} 12% {{ opacity: 1; transform: translate(-50%, -50%) scale(1.12) rotate(2deg); }} 22% {{ transform: translate(-50%, -50%) scale(1) rotate(0); }} 75% {{ opacity: 1; }} 100% {{ opacity: 0; transform: translate(-50%, -65%) scale(.9); }} }}
     .slot-row {{ display: flex; justify-content: center; gap: 14px; margin: 12px 0; }}
     .reel-cell {{ width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 15px; background: #ffffff; padding: 6px; overflow: hidden; }}
     .reel-cell img {{ width: 138px; height: 138px; object-fit: cover; object-position: center 28%; background: #ffffff; border-radius: 11px; }}
     .payline {{ border: 4px solid #f7c948; }}
     .controls-gap {{ height: 12px; }}
     @media (max-width: 900px) {{
-        section[data-testid="stSidebar"] {{ width: 210px !important; }}
-        .st-key-right_nav {{ width: 190px; padding: 4.5rem .7rem 1.5rem; }}
+        section[data-testid="stSidebar"] {{ width: 235px !important; }}
+        .st-key-right_nav {{ width: {largura_menu_direito_mobile}px; padding: {"4rem .25rem 1rem" if menu_direito_recolhido else "4.5rem .7rem 1.5rem"}; }}
+        .ifes-logo {{ right: {logo_direito_mobile}px; }}
         .slot {{ padding: 12px; }} .reel-cell {{ width: 90px; height: 90px; }}
         .reel-cell img {{ width: 82px; height: 82px; }} .slot-row {{ gap: 8px; }}
     }}
@@ -218,7 +336,7 @@ def categoria_visual(resultado: str) -> str:
     return f"{nome_do_simbolo(simbolo, incluir_letra=False)} × 3"
 
 
-def mostrar_maquina(tabuleiro: list[list[str]]) -> None:
+def mostrar_maquina(tabuleiro: list[list[str]], lucro: float | None = None) -> None:
     partes = ['<div class="slot">']
     for linha_idx, linha in enumerate(tabuleiro):
         celulas = []
@@ -230,33 +348,17 @@ def mostrar_maquina(tabuleiro: list[list[str]]) -> None:
             classe = "reel-cell payline" if linha_idx == 1 else "reel-cell"
             celulas.append(f'<div class="{classe}"><img src="{imagem}" alt="Retrato de {nome}, símbolo {letra}"></div>')
         partes.append(f'<div class="slot-row">{"".join(celulas)}</div>')
+    if lucro is not None:
+        classe = "positive" if lucro > 0 else "negative"
+        sinal = "+" if lucro > 0 else ""
+        partes.append(f'<div class="round-payout {classe}" role="status">{sinal}{lucro:.0f}</div>')
     partes.append('</div>')
     st.markdown("".join(partes), unsafe_allow_html=True)
 
 
-def mostrar_frame(container, tabuleiro: list[list[str]]) -> None:
+def mostrar_frame(container, tabuleiro: list[list[str]], lucro: float | None = None) -> None:
     with container.container():
-        mostrar_maquina(tabuleiro)
-
-
-def tabuleiro_visual_aleatorio(rng: random.Random) -> list[list[str]]:
-    colunas = []
-    simbolos = list(modelo.SEQUENCIA_ROLO)
-    for _ in range(3):
-        parada = rng.randrange(5)
-        colunas.append([simbolos[(parada + deslocamento) % 5] for deslocamento in range(3)])
-    return [[colunas[coluna][linha] for coluna in range(3)] for linha in range(3)]
-
-
-def animar_giro(container, status) -> None:
-    rng_visual = random.SystemRandom()
-    inicio = time.monotonic()
-    duracao = 5.15
-    while time.monotonic() - inicio < duracao:
-        mostrar_frame(container, tabuleiro_visual_aleatorio(rng_visual))
-        decorrido = time.monotonic() - inicio
-        status.info(f"🎰 Rolos girando… {min(100, int(decorrido / duracao * 100))}%")
-        time.sleep(0.16)
+        mostrar_maquina(tabuleiro, lucro)
 
 
 def tabuleiro_de_resultado(resultado: dict) -> list[list[str]]:
@@ -271,37 +373,81 @@ if "semente_jogo" not in st.session_state:
     st.session_state.semente_jogo = random.SystemRandom().randrange(0, 2_147_483_648)
 
 with st.sidebar:
-    st.header("Navegação")
-    st.write("Explore a máquina, rode simulações e consulte os experimentos do trabalho.")
-    st.divider()
-    st.caption("Aposta: 1 crédito · Chance de prêmio: 4% · RTP teórico: 84%")
-    st.number_input(
-        "Semente do jogo",
-        min_value=0,
-        max_value=2_147_483_647,
-        step=1,
-        key="semente_jogo",
-        help="A semente identifica a sequência pseudoaleatória desta sessão. Troque-a para iniciar outra sequência.",
-    )
-    st.caption("Teclado: use Tab para focar um botão e Enter ou Espaço para acioná-lo.")
-
+    if pagina_atual == "Jogar":
+        st.header("Seu painel")
+        if "saldo" not in st.session_state:
+            st.session_state.saldo = 100
+            st.session_state.ultima_rodada = None
+            st.session_state.historico = []
+        st.markdown(
+            f'<div class="balance-card"><div class="balance-label">Créditos disponíveis</div>'
+            f'<div class="balance-value">{st.session_state.saldo:.0f} créditos</div></div>',
+            unsafe_allow_html=True,
+        )
+        with st.container(key="session_rounds"):
+            st.caption(f"Rodadas nesta sessão: {len(st.session_state.historico)}")
+        st.markdown(
+            '<div class="sidebar-note">Somente a linha central paga.<br><br>'
+            'Lucro líquido = prêmio − aposta.</div>',
+            unsafe_allow_html=True,
+        )
+        st.divider()
+        with st.container(key="prizes_section"):
+            st.markdown("### Combinações premiadas")
+            itens_premio = []
+            for simbolo, premio in modelo.PAGAMENTOS_BASE.items():
+                docente = DOCENTES[simbolo]
+                imagem = imagem_data_uri(docente["arquivo"])
+                descricao = html.escape(f"Três retratos de {docente['nome']}")
+                retratos = "".join(f'<img src="{imagem}" alt="{descricao}">' for _ in range(3))
+                itens_premio.append(
+                    f'<div class="prize-item"><div><div class="prize-symbols" role="img" aria-label="{descricao}">{retratos}</div>'
+                    f'<div class="prize-description">{html.escape(docente["nome"])}</div></div>'
+                    f'<span class="prize-value">{premio:.0f} cr.</span></div>'
+                )
+            st.markdown('<div class="prize-list">' + "".join(itens_premio) + '</div>', unsafe_allow_html=True)
+        st.divider()
+        st.markdown(
+            '<div class="chance-panel"><div class="chance-kicker">ANTES DE GIRAR</div>'
+            '<div class="chance-title">Entenda as chances</div><div class="chance-summary">'
+            '<div class="chance-row"><span>Chance de prêmio</span><strong>4%</strong></div>'
+            '<div class="chance-row"><span>Chance sem prêmio</span><strong>96%</strong></div>'
+            '<div class="chance-row"><span>RTP teórico</span><strong>84%</strong></div>'
+            '</div></div>',
+            unsafe_allow_html=True,
+        )
+        st.divider()
 if st.session_state.get("semente_ativa") != int(st.session_state.semente_jogo):
     st.session_state.semente_ativa = int(st.session_state.semente_jogo)
     st.session_state.rng_jogo = random.Random(st.session_state.semente_ativa)
 
-main_col, nav_col = st.columns([1, 0.19], gap="large")
+main_col, nav_col = st.columns([1, proporcao_menu_direito], gap="large")
 with nav_col:
     with st.container(key="right_nav"):
-        st.markdown("### Páginas")
-        for nome, rotulo in [
-            ("Jogar", "🎮  Jogar"),
-            ("Simulação", "📊  Simulação"),
-            ("Experimentos", "📚  Experimentos"),
-            ("Entenda a máquina", "🌱  Entenda a máquina"),
-        ]:
-            if st.button(rotulo, key=f"nav_{nome}", use_container_width=True):
-                st.session_state.pagina_atual = nome
-                st.rerun()
+        if st.button("»" if menu_direito_recolhido else "«", key="toggle_right_nav", help="Expandir navegação" if menu_direito_recolhido else "Minimizar navegação"):
+            st.session_state.menu_direito_recolhido = not menu_direito_recolhido
+            st.rerun()
+        if not menu_direito_recolhido:
+            st.markdown("### Páginas")
+            for nome, rotulo in [
+                ("Jogar", "🎮  Jogar"),
+                ("Simulação", "📊  Simulação"),
+                ("Experimentos", "📚  Experimentos"),
+                ("Entenda a máquina", "🌱  Entenda a máquina"),
+            ]:
+                if st.button(rotulo, key=f"nav_{nome}", use_container_width=True):
+                    st.session_state.pagina_atual = nome
+                    st.rerun()
+            st.markdown('<div class="right-nav-settings-spacer"></div>', unsafe_allow_html=True)
+            st.number_input(
+                "Semente do jogo",
+                min_value=0,
+                max_value=2_147_483_647,
+                step=1,
+                key="semente_jogo",
+                help="A semente identifica a sequência pseudoaleatória desta sessão. Troque-a para iniciar outra sequência.",
+            )
+            st.caption("Teclado: use Tab para focar um botão e Enter ou Espaço para acioná-lo.")
 
 with main_col:
     if pagina_atual == "Jogar":
@@ -312,7 +458,6 @@ with main_col:
             st.session_state.historico = []
 
         lado_jogo = st.container(key="game_machine")
-        lado_info = st.container(key="game_panel")
         with lado_jogo:
             if st.session_state.ultima_rodada is None:
                 tabuleiro = [["A", "B", "C"], ["A", "B", "C"], ["C", "D", "E"]]
@@ -321,7 +466,8 @@ with main_col:
             margem_esquerda, coluna_maquina, margem_direita = st.columns([1, 2.4, 1], gap="small")
             with coluna_maquina:
                 area_tabuleiro = st.empty()
-                mostrar_frame(area_tabuleiro, tabuleiro)
+                lucro_animacao = st.session_state.pop("animar_lucro", None)
+                mostrar_frame(area_tabuleiro, tabuleiro, lucro_animacao)
             st.markdown('<div class="controls-gap"></div>', unsafe_allow_html=True)
             margem_botoes, coluna_botoes, margem_botoes_direita = st.columns([1, 2.2, 1], gap="small")
             with coluna_botoes:
@@ -338,55 +484,18 @@ with main_col:
                 st.rerun()
             if girar:
                 status_giro = st.empty()
-                components.html(efeito_roleta_html(), height=0, scrolling=False)
                 resultado = modelo.executar_rodada(st.session_state.rng_jogo)
-                animar_giro(area_tabuleiro, status_giro)
+                with area_tabuleiro.container():
+                    components.html(animacao_roleta_html(resultado), height=580, scrolling=False)
+                time.sleep(DURACAO_GIRO + 0.25)
                 mostrar_frame(area_tabuleiro, tabuleiro_de_resultado(resultado))
                 status_giro.success("Giro concluído.")
                 st.session_state.saldo += resultado["lucro"]
                 st.session_state.ultima_rodada = resultado
                 st.session_state.historico.append(resultado)
+                valor_animado = resultado["premio"] if resultado["premiada"] else resultado["lucro"]
+                st.session_state.animar_lucro = valor_animado
                 st.rerun()
-
-        with lado_info:
-            st.subheader("Seu painel")
-            painel_resumo, painel_tabela, painel_legenda = st.columns([1, 1.8, 1.15], gap="large")
-            atual = st.session_state.ultima_rodada
-            with painel_resumo:
-                st.metric("Saldo fictício", f"{st.session_state.saldo:.0f} créditos")
-                if atual:
-                    if atual["premiada"]:
-                        st.success(f"PRÊMIO · {nome_da_linha(atual['linha_central'])}. Bruto: {atual['premio']:.0f} créditos · líquido: +{atual['lucro']:.0f}.")
-                    else:
-                        st.info(f"SEM PRÊMIO · {nome_da_linha(atual['linha_central'])} · lucro líquido: {atual['lucro']:.0f} crédito.")
-                else:
-                    st.write("Gire os rolos para começar.")
-                if st.session_state.historico:
-                    st.caption(f"Rodadas nesta sessão: {len(st.session_state.historico)}")
-
-            tabela_premios_jogo = pd.DataFrame([
-                {"Combinação": f"{simbolo}–{simbolo}–{simbolo}", "Prêmio bruto": f"{premio:.0f} créditos", "Lucro líquido": f"{premio - 1:.0f} créditos"}
-                for simbolo, premio in modelo.PAGAMENTOS_BASE.items()
-            ])
-            with painel_tabela:
-                st.markdown("**Pagamentos da linha central**")
-                st.dataframe(tabela_premios_jogo, hide_index=True, use_container_width=True)
-                st.caption("O prêmio bruto inclui a aposta de 1 crédito; o lucro líquido desconta esse crédito.")
-            with painel_legenda:
-                st.markdown("**Professores e símbolos**")
-                st.markdown("\n".join(f"- **{docente['nome']}** — {simbolo}" for simbolo, docente in DOCENTES.items()))
-                st.caption("Somente a linha central paga. Os créditos são fictícios.")
-
-            with st.expander("Verificação de uso por teclado e contraste"):
-                st.write("Faça a verificação nesta própria tela e marque cada item concluído. Use Tab para percorrer os controles, Enter ou Espaço para acionar o giro e Shift+Tab para voltar.")
-                st.caption("Contraste medido nas cores principais: texto escuro sobre branco 15,28:1; texto claro sobre azul-marinho 14,72:1; contorno de foco sobre branco 6,80:1; texto escuro sobre a faixa amarela 9,75:1.")
-                st.checkbox("Encontrei o botão Girar rolos pelo teclado e vi o indicador de foco.", key="check_teclado_foco")
-                st.checkbox("Acionei um giro pelo teclado e o texto do resultado e o saldo foram atualizados.", key="check_teclado_giro")
-                st.checkbox("Identifiquei a linha avaliada pelo rótulo e consultei a legenda de nomes e letras.", key="check_info_textual")
-                st.checkbox("Consegui ler os nomes e os controles com contraste entre texto e fundo.", key="check_contraste")
-                chaves_check = ["check_teclado_foco", "check_teclado_giro", "check_info_textual", "check_contraste"]
-                if all(st.session_state.get(chave, False) for chave in chaves_check):
-                    st.success("Verificação de uso concluída nesta sessão.")
 
     elif pagina_atual == "Simulação":
         st.title("Simulação")
@@ -616,3 +725,9 @@ with main_col:
             "- [Documentação oficial do Python — módulo `random` e reprodutibilidade](https://docs.python.org/3/library/random.html)\n"
             "- [NIST — intervalos de confiança para a média](https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm)"
         )
+
+if not menu_direito_recolhido:
+    st.markdown(
+        f'<div class="ifes-logo"><img src="{logo_ifes_data_uri()}" alt="Instituto Federal do Espírito Santo"></div>',
+        unsafe_allow_html=True,
+    )
