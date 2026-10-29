@@ -63,4 +63,8 @@ As páginas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina*
 
 O layout visual foi elaborado no **Excalidraw**. Ferramentas de IA foram usadas como apoio à implementação do código e da interface, e para revisar o projeto com base na lista de requisitos obrigatórios e extras do enunciado. O **NotebookLM** foi usado para pesquisar materiais e esclarecer dúvidas pontuais que surgiram durante o desenvolvimento.
 
+![alt text](image-1.png)
+
 ![alt text](image.png)
+
+![alt text](image-2.png)
