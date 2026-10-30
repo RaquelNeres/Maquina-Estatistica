@@ -37,9 +37,12 @@ streamlit run app.py
 
 Se necessário, use `python -m streamlit run app.py`. O Streamlit mostrará o endereço local para abrir no navegador.
 
-A interface contém as páginas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina**. É possível jogar com créditos fictícios, ajustar parâmetros de simulação, consultar resultados e baixar dados. A área de experimentos apresenta os arquivos disponíveis em `resultados/`; rode `python maquina_estatistica.py` para atualizá-los.
+### O que há em cada página
 
-Na página de jogo, a tabela apresenta as combinações premiadas, os retratos usados na interface e os respectivos valores. A máquina avalia somente a linha central. A interface também inclui controles de áudio, que podem depender das permissões de reprodução do navegador.
+- **Jogar:** permite girar os rolos usando créditos fictícios, acompanhar o saldo e o número de rodadas da sessão, ou reiniciar o saldo. A tabela lateral mostra os trios premiados e seus pagamentos. Só a linha central é avaliada. A página inclui música e efeito sonoro; a reprodução depende das permissões do navegador.
+- **Simulação:** permite escolher a quantidade de rodadas e a semente aleatória. Apresenta métricas de prêmios, RTP e lucro médio, gráficos das frequências e do lucro médio acumulado, além de uma tabela para baixar em CSV.
+- **Experimentos:** reúne tabelas e gráficos dos experimentos E1–E5 já gerados: distribuição de resultados, médias acumuladas, saldos dos participantes, probabilidade condicional e comparação de pagamentos. Para atualizar esses arquivos, execute `python maquina_estatistica.py`.
+- **Entenda a máquina:** explica as regras dos rolos, as probabilidades, os pagamentos e a diferença entre prêmio bruto e lucro líquido. Também apresenta os resultados dos experimentos e fontes para aprofundar o estudo.
 
 ## O que o projeto calcula
 

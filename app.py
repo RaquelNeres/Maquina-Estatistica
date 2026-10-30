@@ -227,7 +227,7 @@ st.markdown(
     .stApp, .stApp p, .stApp label, .stApp h1, .stApp h2, .stApp h3,
     .stApp h4, .stApp [data-testid="stMetricLabel"],
     .stApp [data-testid="stMetricValue"], .stApp [data-testid="stCaptionContainer"] {{ color: #17263a; }}
-    section[data-testid="stSidebar"] {{ width: 250px !important; {sidebar_css} }}
+    section[data-testid="stSidebar"] {{ {sidebar_css} }}
     [data-testid="stSidebar"] > div:first-child {{ background: #583425; }}
     [data-testid="stSidebar"] * {{ color: #fff7ed !important; }}
     [data-testid="stSidebar"] input {{ color: #17263a !important; }}
@@ -241,7 +241,7 @@ st.markdown(
     button[data-testid="stSidebarCollapsedControl"],
     [data-testid="stSidebarCollapseButton"] {{
         display: flex !important; visibility: visible !important; opacity: 1 !important;
-        pointer-events: auto !important; z-index: 1101 !important;
+        pointer-events: auto !important; z-index: 1201 !important;
     }}
     [data-testid="stMetric"] {{ background: white; color: #17263a; padding: 18px 20px; border-radius: 16px; border: 1px solid #d7e1ec; }}
     [data-testid="stMetric"] label, [data-testid="stMetric"] [data-testid="stMetricValue"] {{ color: #17263a !important; }}
@@ -270,13 +270,13 @@ st.markdown(
         outline: 3px solid #8a4b00 !important; outline-offset: 3px !important;
         box-shadow: 0 0 0 2px #ffffff !important;
     }}
-    .st-key-right_nav {{ position: fixed; z-index: 1000; top: 0; right: 0; bottom: 0; width: {largura_menu_direito}px; height: 100vh; min-height: 100vh; box-sizing: border-box; overflow-y: auto; background: #583425; border-radius: 0; padding: {"4rem .4rem 1rem" if menu_direito_recolhido else "5rem 1.1rem 2rem"}; }}
+    .st-key-right_nav {{ position: fixed; z-index: 1000; top: 0; right: 0; bottom: 0; width: {"44px" if menu_direito_recolhido else f"{largura_menu_direito}px"}; height: 100vh; min-height: 100vh; box-sizing: border-box; overflow-y: {"visible" if menu_direito_recolhido else "auto"}; background: {"transparent" if menu_direito_recolhido else "#583425"}; border-radius: 0; padding: {"0" if menu_direito_recolhido else "5rem 1.1rem 2rem"}; }}
     .st-key-right_nav h3, .st-key-right_nav p {{ color: #fff7ed !important; }}
     .st-key-right_nav .stButton {{ display: flex; justify-content: center; }}
     .st-key-right_nav .stButton button {{ width: 90%; margin: 0 auto; color: #f4a11a; background: transparent; border: 1px solid rgba(255,255,255,.18); text-align: center; }}
     .st-key-right_nav .stButton button:hover {{ background: rgba(255,255,255,.12); border-color: #f4a11a; }}
-    .st-key-right_nav .st-key-toggle_right_nav {{ position: absolute; z-index: 3; top: 2.4rem; right: .6rem; width: 36px; }}
-    .st-key-right_nav .st-key-toggle_right_nav button {{ width: 36px; min-width: 36px; height: 36px; padding: 0; border: 0; background: transparent; color: #fff7ed; font-size: 1.35rem; }}
+    .st-key-right_nav .st-key-toggle_right_nav {{ position: absolute; z-index: 1202; pointer-events: auto; top: {"3.5rem" if menu_direito_recolhido else "2.4rem"}; right: {".35rem" if menu_direito_recolhido else ".6rem"}; width: 36px; }}
+    .st-key-right_nav .st-key-toggle_right_nav button {{ width: 36px; min-width: 36px; height: 36px; padding: 0; border: {"1px solid rgba(255,255,255,.2)" if menu_direito_recolhido else "0"}; border-radius: {"50%" if menu_direito_recolhido else "0"}; background: {"#583425" if menu_direito_recolhido else "transparent"}; color: #fff7ed; font-size: 1.35rem; }}
     .right-nav-settings-spacer {{ height: 1.15rem; }}
     .ifes-logo {{ position: fixed; z-index: 1002; right: {logo_direito}px; bottom: 1rem; width: 126px; padding: 0; background: transparent; border: 0; box-shadow: none; pointer-events: none; }}
     .ifes-logo img {{ display: block; width: 100%; height: auto; background: transparent; }}
@@ -293,8 +293,7 @@ st.markdown(
     .payline {{ border: 4px solid #f7c948; }}
     .controls-gap {{ height: 12px; }}
     @media (max-width: 900px) {{
-        section[data-testid="stSidebar"] {{ width: 235px !important; }}
-        .st-key-right_nav {{ width: {largura_menu_direito_mobile}px; padding: {"4rem .25rem 1rem" if menu_direito_recolhido else "4.5rem .7rem 1.5rem"}; }}
+        .st-key-right_nav {{ width: {"44px" if menu_direito_recolhido else f"{largura_menu_direito_mobile}px"}; padding: {"0" if menu_direito_recolhido else "4.5rem .7rem 1.5rem"}; background: {"transparent" if menu_direito_recolhido else "#583425"}; }}
         .ifes-logo {{ right: {logo_direito_mobile}px; }}
         .slot {{ padding: 12px; }} .reel-cell {{ width: 90px; height: 90px; }}
         .reel-cell img {{ width: 82px; height: 82px; }} .slot-row {{ gap: 8px; }}
@@ -645,6 +644,18 @@ with main_col:
         st.info("Esperança é uma média de longo prazo, não uma promessa para cada rodada ou para o saldo de uma pessoa. Uma rodada pode pagar muito, pouco ou nada.")
 
         st.subheader("4. O que observamos nos nossos experimentos?")
+        st.markdown(
+            "Um giro termina em poucos segundos; entender o que ele significa exige olhar para muitos giros. "
+            "Por isso, em vez de confiar na impressão deixada por uma sequência curta, acompanhamos os resultados "
+            "em cinco experimentos. Cada um ilumina uma parte diferente da máquina: o que aparece, como as médias "
+            "se comportam, o que pode acontecer com um saldo, se um giro depende do anterior e o efeito de mudar "
+            "os pagamentos."
+        )
+        st.info(
+            "Antes de olhar os dados, vale lembrar a referência do modelo: há 4% de chance de prêmio por giro, "
+            "RTP teórico de 84% e lucro esperado de −0,16 crédito por aposta. São médias e probabilidades de "
+            "longo prazo; não descrevem o destino de cada rodada ou participante."
+        )
         dados_e1 = ler_resultado("e1_resumo.csv")
         frequencias_e1 = ler_resultado("e1_frequencias.csv")
         if dados_e1 is not None and not dados_e1.empty:
@@ -658,7 +669,8 @@ with main_col:
                 f"No E1, com {int(r['rodadas']):,} rodadas, a frequência de prêmios foi "
                 f"**{r['proporcao_premiada'] * 100:.2f}%**, perto dos 4% previstos. "
                 f"O lucro médio observado foi **{r['lucro_medio_creditos']:.4f} crédito por rodada**. "
-                "A diferença para a média teórica é uma oscilação da amostra; não muda a probabilidade definida pelo modelo."
+                "A diferença para a média teórica é uma oscilação da amostra: com uma quantidade finita de giros, "
+                "os resultados não precisam coincidir exatamente com o esperado. Isso não muda a probabilidade definida pelo modelo."
             )
             if frequencias_e1 is not None:
                 st.markdown("**E1 — proporção teórica e observada por resultado**")
@@ -679,7 +691,7 @@ with main_col:
             if e2 is not None and not e2.empty:
                 ultimos = e2[e2["rodadas"] == e2["rodadas"].max()][["semente", "media_acumulada"]]
                 st.dataframe(ultimos.rename(columns={"semente": "Semente", "media_acumulada": "Lucro médio acumulado"}), hide_index=True, use_container_width=True)
-                st.caption("As sementes produzem amostras diferentes; com mais rodadas, as médias tendem a se aproximar da esperança teórica.")
+                st.caption("Cada semente inicia uma sequência diferente. Ao acompanhar as médias acumuladas, vemos que elas oscilam e tendem a se estabilizar com mais rodadas, sem garantia de coincidirem exatamente com a esperança teórica.")
         with c2:
             st.markdown("**E3 — 100 participantes simulados**")
             e3 = ler_resultado("e3_resumo.csv")
@@ -689,7 +701,9 @@ with main_col:
                     f"**{r3['perda_percentual']:.0f}%** terminaram com saldo menor que o inicial; "
                     f"**{r3['ganho_percentual']:.0f}%** terminaram com mais e "
                     f"**{r3['esgotamento_percentual']:.0f}%** ficaram sem crédito para continuar. "
-                    "É o resultado deste grupo simulado, com saldo inicial e limite de rodadas definidos no experimento."
+                    "Esses números mostram que a média por rodada e a experiência de um participante são medidas diferentes: "
+                    "algumas trajetórias terminam antes do limite por falta de saldo. É o resultado deste grupo simulado, "
+                    "com saldo inicial, semente e limite de rodadas definidos no experimento."
                 )
 
         c3, c4 = st.columns(2)
@@ -702,7 +716,7 @@ with main_col:
                     "proporcao_observada": "Prêmio observado no próximo giro",
                     "referencia_teorica": "Referência teórica",
                 }), hide_index=True, use_container_width=True)
-                st.caption("No modelo, a rodada seguinte é sorteada de novo; um prêmio anterior não aumenta a chance do próximo.")
+                st.caption("As proporções observadas podem oscilar, mas no modelo cada rodada é sorteada de novo. Um prêmio anterior não aumenta nem reduz a chance do próximo: ela permanece em 4%.")
         with c4:
             st.markdown("**E5 — o que muda ao aumentar os pagamentos?**")
             e5 = ler_resultado("e5_comparacao_pagamentos.csv")
@@ -713,7 +727,7 @@ with main_col:
                     "rtp_observado_percentual": "RTP observado (%)",
                     "lucro_esperado_teorico": "Lucro esperado/rodada",
                 }), hide_index=True, use_container_width=True)
-                st.caption("O E5 reutiliza os mesmos giros e altera os pagamentos, isolando o efeito da tabela de prêmios.")
+                st.caption("O E5 reutiliza os mesmos giros e altera os pagamentos, isolando o efeito da tabela de prêmios. A chance de ganhar não muda; muda quanto cada combinação paga e, com isso, o RTP e o lucro esperado.")
 
         st.subheader("5. Como interpretar — e quais são os limites")
         st.markdown(
