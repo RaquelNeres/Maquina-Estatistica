@@ -449,6 +449,12 @@ with nav_col:
             )
             st.caption("Teclado: use Tab para focar um botão e Enter ou Espaço para acioná-lo.")
 
+if not menu_direito_recolhido:
+    st.markdown(
+        f'<div class="ifes-logo"><img src="{logo_ifes_data_uri()}" alt="Instituto Federal do Espírito Santo"></div>',
+        unsafe_allow_html=True,
+    )
+
 with main_col:
     if pagina_atual == "Jogar":
         components.html(cabecalho_jogo_html(), height=110, scrolling=False)
@@ -725,9 +731,3 @@ with main_col:
             "- [Documentação oficial do Python — módulo `random` e reprodutibilidade](https://docs.python.org/3/library/random.html)\n"
             "- [NIST — intervalos de confiança para a média](https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm)"
         )
-
-if not menu_direito_recolhido:
-    st.markdown(
-        f'<div class="ifes-logo"><img src="{logo_ifes_data_uri()}" alt="Instituto Federal do Espírito Santo"></div>',
-        unsafe_allow_html=True,
-    )

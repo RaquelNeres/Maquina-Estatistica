@@ -264,7 +264,10 @@ def experimento_3() -> pd.DataFrame:
 
     plt.figure(figsize=(10, 5))
     for pessoa, saldos in trajetorias:
-        plt.plot(range(len(saldos)), saldos, label=f"Participante {pessoa}")
+        # Apos parar, o saldo permanece constante ate o horizonte de 500 rodadas.
+        saldo_final = saldos[-1]
+        saldos_plot = saldos + [saldo_final] * (501 - len(saldos))
+        plt.plot(range(501), saldos_plot, label=f"Participante {pessoa}")
     plt.axhline(100, linestyle="--", label="Saldo inicial = 100")
     plt.xlabel("Rodada")
     plt.ylabel("Saldo (creditos)")
@@ -341,12 +344,12 @@ def experimento_5(dados_base: pd.DataFrame) -> pd.DataFrame:
 # ------------------------------ EXTRAS ----------------------------------
 
 def extra_intervalo_confianca(dados: pd.DataFrame) -> pd.DataFrame:
-    """IC aproximado de 95% para o lucro medio usando intervalo t."""
+    """IC aproximado de 95% para o lucro medio usando aproximacao normal."""
     lucros = dados["lucro"].to_numpy(dtype=float)
     n = len(lucros)
     media = float(np.mean(lucros))
     erro_padrao = float(np.std(lucros, ddof=1) / np.sqrt(n))
-    # Para n=10000, 1.96 e uma aproximacao muito boa do quantil t de 95%.
+    # Multiplicador 1.96 da aproximacao normal para 95%.
     margem = 1.96 * erro_padrao
     tabela = pd.DataFrame([{
         "metodo": "Intervalo normal aproximado de 95% para a media",
@@ -420,6 +423,8 @@ def extra_limites_exposicao() -> pd.DataFrame:
             "saldo_final_medio": float(np.mean(saldos)),
             "saldo_final_mediano": float(np.median(saldos)),
             "percentual_perda": float(np.mean(np.asarray(saldos) < 100) * 100),
+            "percentual_ganho": float(np.mean(np.asarray(saldos) > 100) * 100),
+            "percentual_empate": float(np.mean(np.asarray(saldos) == 100) * 100),
             "percentual_esgotamento": float(np.mean(esgotamentos) * 100),
             "rodadas_media": float(np.mean(rodadas)),
             "semente": 700 + limite,

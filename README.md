@@ -1,70 +1,72 @@
 # Máquina Estatística — IFES
 
-Simulador acadêmico para o Trabalho I de Probabilidade e Estatística I.
+Projeto acadêmico para o Trabalho I de Probabilidade e Estatística I. O programa simula uma máquina de três rolos e permite explorar probabilidades, pagamentos e resultados de diferentes experimentos.
 
-> **Simulador acadêmico — somente créditos fictícios.**
+> **Simulador acadêmico: utiliza somente créditos fictícios.**
 
 ## Requisitos
-- Python 3.10 ou superior recomendado
-- `numpy`, `pandas`, `streamlit` e `matplotlib`
 
-Instale as dependências:
+- Python 3.10 ou superior
+- Dependências listadas em `requirements.txt`
+
+Instale as dependências na pasta do projeto:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-## Como executar
-Na pasta que contém `maquina_estatistica.py`, execute:
+## Executar os experimentos
+
+Rode o programa principal:
+
 ```bash
 python maquina_estatistica.py
 ```
-O programa cria/atualiza a pasta `resultados/`, com tabelas CSV, gráficos PNG e metadados do ambiente.
 
-<br>
+Essa execução atualiza os arquivos da pasta `resultados/` e roda as verificações automatizadas. Os resultados das verificações ficam em `resultados/extra_testes_automatizados.csv`; se alguma falhar, o programa encerra com um aviso.
 
-## Interface visual
-Para abrir o simulador interativo no navegador:
+Os resultados incluem tabelas CSV, gráficos PNG e metadados da execução. Para reproduzir as análises, use os mesmos arquivos e sementes registrados no código e em `resultados/metadados_execucao.json`.
+
+## Abrir a interface
+
+Inicie a aplicação interativa com:
+
 ```bash
-streamlit run app.py
-
-# se der erro no Device Guard
-python -m streamlit run app.py 
-```
-### Para o Ubuntu no WSL (caso o Windows continue com restrições do Device Guard)
-Caso as políticas de segurança do Windows (Device Guard / WDAC) impeçam o carregamento de binários `.pyd` (como o NumPy), execute a aplicação via WSL:
-```bash
-sudo apt update && sudo apt install -y python3-venv python3-pip
-
-python3 -m venv .venv_linux
-source .venv_linux/bin/activate
-
-pip install -r requirements.txt
 streamlit run app.py
 ```
 
-As páginas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina** permitem brincar com a máquina, ajustar sementes e número de rodadas, visualizar gráficos e baixar resultados em CSV. A página educativa explica o modelo e os resultados E1–E5 em linguagem acessível, com fontes verificáveis. Em **Jogar**, os retratos representam os símbolos A–E; a tabela mostra os pagamentos e a legenda associa cada professor à sua letra. A música de `assets/audio/fortune_tiger_theme.m4a` toca em loop e pode ser ligada ou desligada pelo ícone ao lado do título. O efeito sonoro da roleta toca ao girar. Se o navegador bloquear a reprodução automática, clique no ícone para ativar a música. Use Tab e Enter ou Espaço para operar os controles. O painel de verificação acessível permite registrar a checagem de foco, operação por teclado, contraste e informação textual. A página de experimentos lê as tabelas já geradas em `resultados/`; rode `python maquina_estatistica.py` para atualizá-las.
+Se necessário, use `python -m streamlit run app.py`. O Streamlit mostrará o endereço local para abrir no navegador.
 
-## Conteúdo implementado
-- Máquina de três rolos e avaliação exclusiva da linha central.
-- Experimentos obrigatórios E1–E5, com sementes especificadas no enunciado.
-- CSVs, gráficos e metadados para reprodução.
-- Página educativa para público não especializado, com resultados próprios e fontes verificáveis.
-- Interface de jogo com retratos dos professores: A = Giraldeli, B = Calhau, C = Graziela, D = Rapchan, E = Fidelis.
-- Controles de teclado, foco visível, texto com contraste e verificação de uso por checklist.
-- Extras: intervalo aproximado de 95% para a média do lucro, comparação de distribuições com mesmo RTP, limites de exposição, análise de sensibilidade e testes automatizados.
+A interface contém as páginas **Jogar**, **Simulação**, **Experimentos** e **Entenda a máquina**. É possível jogar com créditos fictícios, ajustar parâmetros de simulação, consultar resultados e baixar dados. A área de experimentos apresenta os arquivos disponíveis em `resultados/`; rode `python maquina_estatistica.py` para atualizá-los.
 
-## Observações para o relatório
-- O intervalo de confiança é uma aproximação normal para a média amostral, não um intervalo para resultados individuais.
-- As simulações são didáticas e não estimam prevalência de transtornos ou perdas da população brasileira.
-- Os resultados observados podem diferir dos valores teóricos por variabilidade aleatória.
-- Antes da entrega, confira as tabelas e gráficos, redija as interpretações com suas próprias palavras e verifique as exigências completas do enunciado.
+Na página de jogo, a tabela apresenta as combinações premiadas, os retratos usados na interface e os respectivos valores. A máquina avalia somente a linha central. A interface também inclui controles de áudio, que podem depender das permissões de reprodução do navegador.
+
+## O que o projeto calcula
+
+- Experimentos E1–E5: frequências e lucro, médias acumuladas, trajetórias de saldo, probabilidades condicionais e comparação de pagamentos.
+- Análises complementares: intervalo normal aproximado de 95% para a média do lucro, comparação de tabelas com o mesmo RTP, limites de exposição e análise de sensibilidade.
+- Verificações automatizadas de pagamentos, cálculos, reprodutibilidade e casos-limite.
+
+Na comparação de mesmo RTP, os resultados apresentam pagamentos e dispersão dos lucros; saldos finais de participantes não são calculados nessa análise. A análise de limites de exposição apresenta percentuais de ganho, empate, perda e esgotamento, além de saldos e rodadas médias.
+
+## Como interpretar
+
+- O intervalo de 95% usa uma aproximação normal para a média amostral de uma sequência do E1. Não é um intervalo para resultados individuais.
+- Resultados simulados podem variar em relação aos valores teóricos por causa da variabilidade aleatória.
+- A simulação é didática e não estima perdas ou prevalência de transtornos na população.
+- Consulte o enunciado completo antes de usar os resultados no relatório e redija as interpretações com suas próprias palavras.
 
 ## Ferramentas e declaração de uso de IA
 
-O layout visual foi elaborado no **Excalidraw**. Ferramentas de IA foram usadas como apoio à implementação do código e da interface, e para revisar o projeto com base na lista de requisitos obrigatórios e extras do enunciado. O **NotebookLM** foi usado para pesquisar materiais e esclarecer dúvidas pontuais que surgiram durante o desenvolvimento.
+O layout visual foi elaborado no Excalidraw. Ferramentas de IA foram usadas como apoio à implementação e revisão do projeto. O NotebookLM foi usado para pesquisar materiais e esclarecer dúvidas durante o desenvolvimento.
 
-![alt text](image-1.png)
+## Cada etapa no desenvolvimento da interface
 
-![alt text](image.png)
-
-![alt text](image-2.png)
+<div align="center">
+  <img src="./image-1.png" width="70%" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  <br><br>
+  <img src="./image.png" width="70%" style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  <br><br>
+  <img src="./image-2.png" width="70%"  style="border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+  <p>Linha do tempo</p>
+</div>
