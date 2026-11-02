@@ -106,7 +106,7 @@ const finalBoard = __FINAL_BOARD__;
 const cells = Array.from(document.querySelectorAll('.reel-cell img'));
 const audio = document.getElementById('spin-audio');
 const durationMs = __DURATION__ * 1000;
-audio.volume = 0.16;
+audio.volume = 0.10;
 function showBoard(board) {
     cells.forEach((cell, i) => { cell.src = images[board[Math.floor(i / 3)][i % 3]]; });
 }
@@ -184,7 +184,7 @@ def cabecalho_jogo_html() -> str:
         button.setAttribute('aria-label', playing ? 'Desativar som' : 'Ativar som');
         button.title = playing ? 'Desativar som' : 'Ativar som';
     }
-    audio.volume = 0.18;
+    audio.volume = 0.08;
     button.addEventListener('click', async () => {
         if (audio.paused) {
             try { await audio.play(); showState(true); } catch (_) { showState(false); }
